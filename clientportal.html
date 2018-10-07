@@ -1,0 +1,30 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.js"></script>
+
+<div align='center'>
+
+
+
+<button onclick='socket.emit("toggle", {time: document.getElementById("startUpAmount").value} );'  style='width: 60%; height: 50px'><h1>
+Toggle
+</h1></button><br><br>
+
+<input id='startUpAmount' placeholder='Startup amount' style='width: 60%; height: 50px'>
+
+<textarea id='input'></textarea>
+<button onclick='submit()'>Save Workout</button>
+
+</div>
+
+
+<script>
+var socket = io();
+
+function submit() {
+
+  socket.emit('updateWorkout', document.getElementById('input').value);
+
+}
+
+</script>

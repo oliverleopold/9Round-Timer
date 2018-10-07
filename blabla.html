@@ -1,0 +1,198 @@
+<script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.js'></script>
+<br><br><br>
+
+<a href='#' onclick='socket.emit("updatePercision", "p1")'><div class="light go" id='go' ></div></a>
+
+<a href='#' onclick='socket.emit("updatePercision", "p2")'><div class="light slow" id='slow' ></div></a>
+<a href='#' onclick='socket.emit("updatePercision", "p3")'><div class="light stop" id='stop' ></div></a>
+
+<h1 id='content'></h1>
+
+<p id='activerest'>
+</p>
+<style>
+
+.light {
+  height: 120px;
+  width : 120px;
+  border-radius: 50%;
+  opacity : 0.3; /* makes colors less bright by default */
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.stop {background-color: red;}
+.slow {background-color: yellow;}
+.go {background-color: lightgreen;}
+.on {opacity: 1;}
+
+body {
+  background-color : black;
+  text-align: center;
+  color :white;
+  font-family: Helvetica;
+}
+
+</style>
+
+
+<script>
+
+
+   var LIGHTS = document.getElementsByClassName("light");
+
+/* This defines a function which turns off every light by removing the "on" class from the HTML elements.*/
+function allOff() {
+  for (var i=0; i<LIGHTS.length; i = i+1) {
+    LIGHTS[i].classList.remove("on");
+  }
+}
+
+
+var DOTS = document.getElementsByClassName("dot");
+
+/* This defines a function which turns off every light by removing the "on" class from the HTML elements.*/
+function allOffDots() {
+for (var i=0; i<DOTS.length; i = i+1) {
+ DOTS[i].classList.remove("super");
+}
+}
+
+allOff();
+
+
+var socket = io();
+
+function createPerson(round)
+{
+  socket.emit("newPerson", round);
+
+}
+
+ var bottomNotice = "";
+
+
+socket.on('newData', function(data) {
+  allOffDots();
+
+ bottomNotice = "";
+
+for (var x = 0; x<data[0].rounds.length; x++) {
+
+if (data[0].rounds[x] == data[0].freestyle)
+{
+  bottomNotice += "<br>You have a member at freestyle.";
+}
+document.getElementById("dot-" + data[0].rounds[x]).classList.add("super");
+
+}
+
+console.log(data);
+data[0].time = Math.ceil(data[0].time / 1) * 1;
+data.status = data[0].status;
+allOff();
+if (data.status == "off") {
+
+document.getElementById('content').innerHTML = "off";
+document.getElementById('activerest').innerHTML = "";
+} else if (data.status == "startup") {
+document.getElementById("stop").classList.add("on");
+document.getElementById('content').innerHTML = "Starting...";
+
+
+} else if (data.status == "p1") {
+document.getElementById("go").classList.add("on");
+if (data[0].time <= 60) {
+
+
+document.getElementById('content').innerHTML = data[0].time + " seconds";
+} else {
+document.getElementById('content').innerHTML = "Workout!";
+
+}
+
+
+document.getElementById('activerest').innerHTML = "Active Rest: " + data[0].activeRest;
+
+} else if (data.status == "p2") {
+
+if (data[0].time <= 5){
+
+
+
+document.getElementById('content').innerHTML = "Active Rest: " + data[0].activeRest;
+
+document.getElementById('activerest').innerHTML = data[0].time + " seconds";
+} else {
+
+document.getElementById('activerest').innerHTML = "Active Rest: " + data[0].activeRest;
+
+document.getElementById('content').innerHTML = "Burn Out: " + data[0].time + " seconds";
+
+}
+
+document.getElementById("slow").classList.add("on");
+
+
+} else if (data.status == "p3") {
+document.getElementById("stop").classList.add("on");
+document.getElementById('content').innerHTML = "Active Rest: " + data[0].activeRest;
+
+document.getElementById('activerest').innerHTML = data[0].time + " seconds";
+
+
+}
+
+document.getElementById('bottomNotice').innerHTML = bottomNotice;
+
+});
+
+</script>
+
+<style>
+.dot {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 15px;
+}
+
+.super {
+
+    background-color: green;
+
+
+}
+button {
+width: 30px;
+margin-left: 10px;
+}
+</style>
+
+
+<div style="text-align:center">
+  <span class="dot" id='dot-1'></span>
+  <span class="dot" id='dot-2'></span>
+  <span class="dot" id='dot-3'></span>
+  <span class="dot" id='dot-4'></span>
+  <span class="dot" id='dot-5'></span>
+  <span class="dot" id='dot-6'></span>
+  <span class="dot" id='dot-7'></span>
+  <span class="dot" id='dot-8'></span>
+  <span class="dot" id='dot-9'></span>
+
+<br>
+  <button onclick='createPerson(1)'>1</button>
+  <button onclick='createPerson(2)'>2</button>
+  <button onclick='createPerson(3)'>3</button>
+  <button onclick='createPerson(4)'>4</button>
+  <button onclick='createPerson(5)'>5</button>
+  <button onclick='createPerson(6)'>6</button>
+  <button onclick='createPerson(7)'>7</button>
+  <button onclick='createPerson(8)'>8</button>
+  <button onclick='createPerson(9)'>9</button>
+<br><br>
+<span id='bottomNotice'></span>
+</div>
