@@ -1,2 +1,2 @@
 # 9Round-Timer
-A timer for 9Round employees
+A NodeJS software for 9Round trainers to track the remaining time and give smart active rests.
